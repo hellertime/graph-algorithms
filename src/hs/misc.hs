@@ -12,6 +12,12 @@ graph1 = foldl addEdge emptyGraph $ concat $ map toEdge edgeList
     edgeList = [('a', "bc"), ('b', "d"), ('c', "de"), ('e', "a")]
     toEdge = \(s, ts) -> map (Edge (Node s) . Node) ts
 
+graph2 :: Graph Char
+graph2 = foldl addEdge emptyGraph $ concat $ map toEdge edgeList
+  where
+    edgeList = [('a', "bc"), ('b', "d"), ('c', "de")]
+    toEdge = \(s, ts) -> map (Edge (Node s) . Node) ts
+
 data DFWState a = DFW { pre_i   :: Int
                       , rpost_j :: Int
                       , pre     :: [(Node a, Int)]
