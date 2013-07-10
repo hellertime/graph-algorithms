@@ -21,12 +21,32 @@ data DFWState a = DFW { pre_i   :: Int
                       , forest  :: Graph a
                       } deriving (Show)
 
-dfw :: DFWState a -> Node a -> DFWState a
-dfw s n =
+mkDFWState j = DFW { pre_i = 1
+                   , rpost_j = j
+                   , pre = []
+                   , rpost = []
+                   , visited = Set.fromList []
+                   , succs = []
+                   , forest = emptyGraph
+                   }
+
+dfwalk :: Ord a => Graph a -> DFWState a
+dfwalk g = foldl go s0 $ Set.toList $ nodes g
   where
+    s0 = mkDFWState (Set.size $ nodes g)
+    go s x = if Set.member x (visited s)
+                 then s
+                 else dfw (s { succs = successors x g }) g x
+
+dfw :: Ord a => DFWState a -> Graph a -> Node a -> DFWState a
+dfw s g n = s'' { rpost = (n,rpost_j s''):(rpost s''), rpost_j = rpost_j s'' - 1} 
+  where
+    s'' = foldl go s' $ succs s
+    s' = s { visited = visited', pre_i = pre_i', pre = pre' }
+    pre_i' = pre_i s + 1
+    pre' = (n,pre_i s):(pre s)
     visited' = Set.insert n $ visited s
-    go x s@(_, _, _, _, v, d) y = if Set.member y v
-                                      then s
-                                      else
-                                          
-    (i + 1, j' - 1, (n,i):pre'', (n,j'):rpost'', visited'', d'')
+    go s y = if Set.member y (visited s)
+                   then s
+                   else dfw (s { forest = addEdge (forest s) (Edge n y)
+                               , succs = successors y g }) g y
