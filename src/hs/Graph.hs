@@ -5,6 +5,7 @@ module Graph
          -- ** Utilities
     ,    addEdge
     ,    emptyGraph
+    ,    reverse
     ,    successors
     )
   where
@@ -12,6 +13,7 @@ module Graph
 import Data.Set (Set)
 import Graph.Edge (Edge)
 import Graph.Node (Node)
+import Prelude hiding (reverse)
 
 import qualified Data.Set as Set
 import qualified Graph.Edge as Edge
@@ -30,5 +32,10 @@ addEdge g e = Graph nodes' edges'
     nodes' = Set.union (Graph.nodes g) (Set.fromList [Edge.source e, Edge.target e])
     edges' = Set.insert e (Graph.edges g)
 
+reverse :: Ord a => Graph a -> Graph a
+reverse g = g { edges = Set.fromList $ map Edge.reverse $ Set.toList $ edges g }
+    
+
 successors :: Eq a => Node a -> Graph a -> [Node a]
 successors n = map Edge.target . Set.toList . Set.filter ((== n) . Edge.source) . edges
+
